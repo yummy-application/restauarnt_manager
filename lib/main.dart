@@ -94,53 +94,12 @@ Widget restaurantButtons(BuildContext context) {
     future: getAllConnectedRestaurants(),
     builder: (context, snapshot) {
       if (snapshot.connectionState == ConnectionState.waiting) {
-        return Center(
+        return const Center(
           child: CircularProgressIndicator(),
         );
       } else if (snapshot.hasError) {
-        return Center(
-          child: Text('Error: ${snapshot.error}'),
-        );
-      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-        return Center(
-          child: Text('No restaurants connected'),
-        );
-      } else {
-        List<Map<String, Object?>> restaurants = snapshot.data!;
         return Column(
           children: [
-            ...restaurants.map((restaurant) {
-              return FutureBuilder<Map<String, Object?>>(
-                future:
-                    getFullRestaurantInfo(restaurant['backend_url'].toString()),
-                builder: (context, innerSnapshot) {
-                  if (innerSnapshot.connectionState ==
-                      ConnectionState.waiting) {
-                    return Center(
-                      child: CircularProgressIndicator(),
-                    );
-                  } else if (innerSnapshot.hasData) {
-                    String restaurantName =
-                        innerSnapshot.data!['name'].toString();
-                    return Row(
-                      children: [
-                        Expanded(
-                          child: ElevatedButton(
-                            onPressed: () {
-                              print(restaurantName);
-                            },
-                            child: Text(restaurantName ?? 'Unknown'),
-                          ),
-                        ),
-                      ],
-                    );
-                  } else {
-                    return SizedBox.shrink();
-                  }
-                },
-              );
-            }).toList(),
-            // Add the "Add a restaurant" button
             ElevatedButton(
               onPressed: () => Navigator.push(
                 context,
@@ -149,9 +108,10 @@ Widget restaurantButtons(BuildContext context) {
                 ),
               ),
               style: ButtonStyle(
-                backgroundColor: WidgetStateProperty.all<Color>(Colors.black26),
-                elevation: WidgetStateProperty.all<double>(3),
-                shape: WidgetStateProperty.all<OutlinedBorder>(
+                backgroundColor:
+                    MaterialStateProperty.all<Color>(Colors.black26),
+                elevation: MaterialStateProperty.all<double>(3),
+                shape: MaterialStateProperty.all<OutlinedBorder>(
                   RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(70)),
                 ),
@@ -168,6 +128,100 @@ Widget restaurantButtons(BuildContext context) {
                 ],
               ),
             ),
+            const Text('Error loading restaurants'),
+          ],
+        );
+      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+        return Column(
+          children: [
+            ElevatedButton(
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const RestaurantSetupSettings(),
+                ),
+              ),
+              style: ButtonStyle(
+                backgroundColor:
+                    MaterialStateProperty.all<Color>(Colors.black26),
+                elevation: MaterialStateProperty.all<double>(3),
+                shape: MaterialStateProperty.all<OutlinedBorder>(
+                  RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(70)),
+                ),
+              ),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.add, color: Colors.white),
+                  SizedBox(width: 8),
+                  Text(
+                    "Add a restaurant",
+                    style: TextStyle(color: Colors.white, fontSize: 20),
+                  ),
+                ],
+              ),
+            ),
+            const Text('No restaurants connected'),
+          ],
+        );
+      } else {
+        List<Map<String, Object?>> restaurants = snapshot.data!;
+        return Column(
+          children: [
+            ElevatedButton(
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const RestaurantSetupSettings(),
+                ),
+              ),
+              style: ButtonStyle(
+                backgroundColor:
+                    MaterialStateProperty.all<Color>(Colors.black26),
+                elevation: MaterialStateProperty.all<double>(3),
+                shape: MaterialStateProperty.all<OutlinedBorder>(
+                  RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(70)),
+                ),
+              ),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.add, color: Colors.white),
+                  SizedBox(width: 8),
+                  Text(
+                    "Add a restaurant",
+                    style: TextStyle(color: Colors.white, fontSize: 20),
+                  ),
+                ],
+              ),
+            ),
+            ...restaurants.map((restaurant) {
+              return FutureBuilder<Map<String, Object?>>(
+                future:
+                    getFullRestaurantInfo(restaurant['backend_url'].toString()),
+                builder: (context, innerSnapshot) {
+                  if (innerSnapshot.connectionState ==
+                      ConnectionState.waiting) {
+                    return const CircularProgressIndicator();
+                  } else if (innerSnapshot.hasError) {
+                    return const Text('Error loading restaurant info');
+                  } else if (innerSnapshot.hasData) {
+                    String restaurantName =
+                        innerSnapshot.data!['name'].toString();
+                    return ElevatedButton(
+                      onPressed: () {
+                        print(restaurantName);
+                      },
+                      child: Text(restaurantName),
+                    );
+                  } else {
+                    return const Text('Unknown restaurant');
+                  }
+                },
+              );
+            }).toList(),
           ],
         );
       }

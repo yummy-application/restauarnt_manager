@@ -132,7 +132,7 @@ class _RestaurantSetupSettingsState extends State<RestaurantSetupSettings> {
               width: 400,
             ),
             ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   if (_formKey.currentState!.validate() &&
                       _addressController.text.isNotEmpty &&
                       _restaurantNameController.text.isNotEmpty &&
@@ -140,18 +140,53 @@ class _RestaurantSetupSettingsState extends State<RestaurantSetupSettings> {
                       _passwordController.text.isNotEmpty &&
                       _passwordController.text.length >= 6) {
                     _formKey.currentState!.save();
-                    addRestaurantConnection(
-                        _addressController.text, _passwordController.text);
-                    createRestaurant.restaurantCreation(
+                    int response = await createRestaurant.restaurantCreation(
                         _addressController.text,
                         _restaurantNameController.text,
                         _restaurantImageController.text,
                         _passwordController.text);
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const HomePage(),
-                        ));
+                    if (response == 200) {
+                      addRestaurantConnection(
+                          _addressController.text, _passwordController.text);
+                      Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const HomePage(),
+                          ));
+                    } else if (response == 409) {
+                      showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              title: const Text("Error"),
+                              content: const Text(
+                                  "There is already a restaurant at this ip"),
+                              actions: [
+                                TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: const Text("OK"))
+                              ],
+                            );
+                          });
+                    } else {
+                      showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              title: Text("Error ${response.toString()}"),
+                              content: const Text("Something went wrong"),
+                              actions: [
+                                TextButton(
+                                    onPressed: () {
+                                      Navigator.pop(context);
+                                    },
+                                    child: const Text("OK"))
+                              ],
+                            );
+                          });
+                    }
                   }
                 },
                 child: const Text("Create Restaurant"))
