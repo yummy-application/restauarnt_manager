@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:restauarnt_manager/http/setup/validation.dart';
+import 'package:restaurant_manager/http/setup/validation.dart';
 import '../http/setup/createRestaurant.dart' as createRestaurant;
 import '../localDB/setup/setup.dart';
 import '../main.dart'; // Assuming this file contains validateBackendAddress function

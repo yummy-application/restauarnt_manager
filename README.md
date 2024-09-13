@@ -1,4 +1,4 @@
-# restauarnt_manager
+# restaurant_manager
 
 An app to manage yummy restaurants
 

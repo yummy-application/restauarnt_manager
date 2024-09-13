@@ -1,4 +1,4 @@
-import 'package:restauarnt_manager/security/md5.dart';
+import 'package:restaurant_manager/security/md5.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 

@@ -1,6 +1,6 @@
 {
-    "name": "restauarnt_manager",
-    "short_name": "restauarnt_manager",
+    "name": "restaurant_manager",
+    "short_name": "restaurant_manager",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

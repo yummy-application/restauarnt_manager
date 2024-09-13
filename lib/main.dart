@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
-import 'package:restauarnt_manager/http/info/restaurantInfo.dart';
-import 'package:restauarnt_manager/restaurantSetup/settings.dart';
+import 'package:restaurant_manager/http/info/restaurantInfo.dart';
+import 'package:restaurant_manager/restaurantManagement/home/homeScreen.dart';
+import 'package:restaurant_manager/restaurantSetup/settings.dart';
 import 'package:sqflite_common_ffi/sqflite_ffi.dart';
+import 'classes/restaurant.dart';
 import 'localDB/getAllRestaurants.dart';
 
 void main() {
@@ -212,7 +214,16 @@ Widget restaurantButtons(BuildContext context) {
                         innerSnapshot.data!['name'].toString();
                     return ElevatedButton(
                       onPressed: () {
-                        print(restaurantName);
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => HomeScreen(
+                                      restaurant: Restaurant(
+                                          restaurantName,
+                                          innerSnapshot.data!['image']
+                                              .toString(),
+                                          restaurant['backend_url'].toString()),
+                                    )));
                       },
                       child: Text(restaurantName),
                     );

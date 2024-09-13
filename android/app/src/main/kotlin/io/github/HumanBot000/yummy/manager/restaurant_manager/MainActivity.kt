@@ -1,4 +1,4 @@
-package io.github.HumanBot000.yummy.app.manager.restauarnt_manager
+package io.github.HumanBot000.yummy.manager.restaurant_manager
 
 import io.flutter.embedding.android.FlutterActivity
 

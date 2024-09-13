@@ -90,12 +90,12 @@ BEGIN
         BLOCK "040904e4"
         BEGIN
             VALUE "CompanyName", "io.github.HumanBot000.yummy.app.manager" "\0"
-            VALUE "FileDescription", "restauarnt_manager" "\0"
+            VALUE "FileDescription", "restaurant_manager" "\0"
             VALUE "FileVersion", VERSION_AS_STRING "\0"
-            VALUE "InternalName", "restauarnt_manager" "\0"
+            VALUE "InternalName", "restaurant_manager" "\0"
             VALUE "LegalCopyright", "Copyright (C) 2024 io.github.HumanBot000.yummy.app.manager. All rights reserved." "\0"
-            VALUE "OriginalFilename", "restauarnt_manager.exe" "\0"
-            VALUE "ProductName", "restauarnt_manager" "\0"
+            VALUE "OriginalFilename", "restaurant_manager.exe" "\0"
+            VALUE "ProductName", "restaurant_manager" "\0"
             VALUE "ProductVersion", VERSION_AS_STRING "\0"
         END
     END
