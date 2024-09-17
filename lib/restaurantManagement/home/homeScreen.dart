@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:restaurant_manager/classes/restaurant.dart';
 
+import '../tableManagement/tables/tables.dart';
+
 class HomeScreen extends StatefulWidget {
   final Restaurant restaurant;
+
   const HomeScreen({super.key, required this.restaurant});
 
   @override
@@ -16,9 +19,12 @@ class _HomeScreenState extends State<HomeScreen> {
       drawer: Drawer(
           child: ListView(padding: EdgeInsets.zero, children: [
         DrawerHeader(
-            decoration: const BoxDecoration(
-              color: Colors.green,
-            ),
+          decoration: const BoxDecoration(
+            color: Colors.green,
+          ),
+          child: InkWell(
+            onTap: () => Navigator.push(context,
+                MaterialPageRoute(builder: (context) => const TableManager())),
             child: Center(
               child: Text(
                 "Table Management",
@@ -26,7 +32,9 @@ class _HomeScreenState extends State<HomeScreen> {
                     color: Theme.of(context).colorScheme.onPrimary,
                     fontSize: 30),
               ),
-            ))
+            ),
+          ),
+        )
       ])),
       appBar: AppBar(
         title: Row(
@@ -74,7 +82,7 @@ Row getTextWithChangingColors(String text,
     ));
   }
   return Row(
-    children: texts,
     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+    children: texts,
   );
 }
