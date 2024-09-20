@@ -5,7 +5,6 @@ import '../tableManagement/tables/tables.dart';
 
 class HomeScreen extends StatefulWidget {
   final Restaurant restaurant;
-
   const HomeScreen({super.key, required this.restaurant});
 
   @override
@@ -23,8 +22,12 @@ class _HomeScreenState extends State<HomeScreen> {
             color: Colors.green,
           ),
           child: InkWell(
-            onTap: () => Navigator.push(context,
-                MaterialPageRoute(builder: (context) => const TableManager())),
+            onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => TableManager(
+                          restaurant: widget.restaurant,
+                        ))),
             child: Center(
               child: Text(
                 "Table Management",

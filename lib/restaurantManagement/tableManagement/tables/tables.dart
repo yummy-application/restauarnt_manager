@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 
+import '../../../classes/restaurant.dart';
+import '../../../http/setup/tables/tableManagement.dart';
+
 class TableManager extends StatefulWidget {
-  const TableManager({super.key});
+  final Restaurant restaurant;
+
+  const TableManager({super.key, required this.restaurant});
 
   @override
   State<TableManager> createState() => _TableManagerState();
@@ -16,6 +21,13 @@ class _TableManagerState extends State<TableManager> {
   List<DataRow> tableRows = [];
 
   @override
+  void dispose() {
+    _nameController.dispose();
+    _seatsController.dispose();
+    super.dispose();
+  }
+
+  @override
   void initState() {
     super.initState();
     _loadInitialTables(); // Load initial tables
@@ -28,23 +40,59 @@ class _TableManagerState extends State<TableManager> {
     });
   }
 
-  // Dummy function to add a new table (update this as needed)
-  void _addNewTable() {
-    setState(() {
-      tableRows.add(
-        DataRow(cells: [
-          DataCell(Text(_nameController.text)),
-          DataCell(Text(_seatsController.text)),
-          DataCell(Text(_selectedRegion)),
-          DataCell(const Text('Available')), // Dummy status
-        ]),
-      );
+  Future<void> _addNewRestaurant(
+      String tableName, String seats, String region) async {
+    final response = await createTable(
+      widget.restaurant.backendAddress,
+      tableName,
+      seats,
+      region,
+    );
 
-      // Clear the form after adding
+    if (response == 401) {
+      _showDialog(
+        title: 'Invalid credentials!',
+        content: 'Please contact your personal support',
+      );
+    } else if (response == 409) {
+      _showDialog(
+        title: 'Table already exists',
+        content: 'The table already exists in the database',
+      );
+    } else if (response == 400) {
+      _showDialog(
+        title: 'Invalid input!',
+        content: 'The table name, seats, and region must not be empty',
+      );
+    } else {
       _nameController.clear();
       _seatsController.clear();
       _selectedRegion = 'North';
-    });
+      _showDialog(
+        title: 'Success',
+        content: 'Table created successfully',
+      );
+    }
+  }
+
+  void _showDialog({required String title, required String content}) {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(content),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+              child: const Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override
@@ -117,7 +165,13 @@ class _TableManagerState extends State<TableManager> {
 
             // Add Table Button
             ElevatedButton(
-              onPressed: _addNewTable,
+              onPressed: () {
+                _addNewRestaurant(
+                  _nameController.text,
+                  _seatsController.text,
+                  _selectedRegion,
+                );
+              },
               child: const Text('Add Table'),
             ),
           ],
