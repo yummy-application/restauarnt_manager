@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:restaurant_manager/http/info/restaurantInfo.dart';
 import 'package:restaurant_manager/restaurantManagement/home/homeScreen.dart';
 import 'package:restaurant_manager/restaurantSetup/settings.dart';
@@ -110,10 +109,9 @@ Widget restaurantButtons(BuildContext context) {
                 ),
               ),
               style: ButtonStyle(
-                backgroundColor:
-                    MaterialStateProperty.all<Color>(Colors.black26),
-                elevation: MaterialStateProperty.all<double>(3),
-                shape: MaterialStateProperty.all<OutlinedBorder>(
+                backgroundColor: WidgetStateProperty.all<Color>(Colors.black26),
+                elevation: WidgetStateProperty.all<double>(3),
+                shape: WidgetStateProperty.all<OutlinedBorder>(
                   RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(70)),
                 ),
@@ -144,10 +142,9 @@ Widget restaurantButtons(BuildContext context) {
                 ),
               ),
               style: ButtonStyle(
-                backgroundColor:
-                    MaterialStateProperty.all<Color>(Colors.black26),
-                elevation: MaterialStateProperty.all<double>(3),
-                shape: MaterialStateProperty.all<OutlinedBorder>(
+                backgroundColor: WidgetStateProperty.all<Color>(Colors.black26),
+                elevation: WidgetStateProperty.all<double>(3),
+                shape: WidgetStateProperty.all<OutlinedBorder>(
                   RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(70)),
                 ),
@@ -179,10 +176,9 @@ Widget restaurantButtons(BuildContext context) {
                 ),
               ),
               style: ButtonStyle(
-                backgroundColor:
-                    MaterialStateProperty.all<Color>(Colors.black26),
-                elevation: MaterialStateProperty.all<double>(3),
-                shape: MaterialStateProperty.all<OutlinedBorder>(
+                backgroundColor: WidgetStateProperty.all<Color>(Colors.black26),
+                elevation: WidgetStateProperty.all<double>(3),
+                shape: WidgetStateProperty.all<OutlinedBorder>(
                   RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(70)),
                 ),
@@ -232,7 +228,7 @@ Widget restaurantButtons(BuildContext context) {
                   }
                 },
               );
-            }).toList(),
+            }),
           ],
         );
       }

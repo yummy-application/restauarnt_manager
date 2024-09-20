@@ -183,13 +183,13 @@ class _TableManagerState extends State<TableManager> {
 
 Future<List<DataRow>> _allTables() async {
   return [
-    DataRow(cells: [
+    const DataRow(cells: [
       DataCell(Text('Table 1')),
       DataCell(Text('4')),
       DataCell(Text('North')),
       DataCell(Text('Available')),
     ]),
-    DataRow(cells: [
+    const DataRow(cells: [
       DataCell(Text('Table 2')),
       DataCell(Text('2')),
       DataCell(Text('East')),
