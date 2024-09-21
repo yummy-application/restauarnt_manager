@@ -17,3 +17,18 @@ Future<int> createTable(String backendAddress, String tableName, String seats,
           }));
   return response.statusCode;
 }
+
+Future<List<dynamic>> getAllTables(String backendAddress) async {
+  final response = await http.post(
+      Uri.parse("$backendAddress/api/table/request/all"),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(
+          {'password': await getRestaurantPasswordHash(backendAddress)}));
+  if (response.statusCode != 200) {
+    throw Exception(
+        "Failed to load tables! Please contact the support! Code: ${response.statusCode}");
+  }
+  return jsonDecode(response.body);
+}

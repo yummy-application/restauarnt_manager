@@ -1,5 +1,10 @@
-import 'package:flutter/material.dart';
+import 'dart:async';
+import 'dart:developer';
 
+import 'package:flutter/material.dart';
+import 'package:restaurant_manager/classes/table.dart';
+
+import '../../../classes/other.dart';
 import '../../../classes/restaurant.dart';
 import '../../../http/setup/tables/tableManagement.dart';
 
@@ -17,7 +22,7 @@ class _TableManagerState extends State<TableManager> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _seatsController = TextEditingController();
   String _selectedRegion = 'North';
-
+  Timer? _autoRefreshTimer;
   List<DataRow> tableRows = [];
 
   @override
@@ -30,11 +35,14 @@ class _TableManagerState extends State<TableManager> {
   @override
   void initState() {
     super.initState();
-    _loadInitialTables(); // Load initial tables
+    _loadInitialTables();
+    _autoRefreshTimer = Timer.periodic(
+        const Duration(minutes: 1), (Timer t) => _loadInitialTables());
   }
 
   Future<void> _loadInitialTables() async {
-    final initialTables = await _allTables();
+    final initialTables =
+        await _allTablesDataRows(widget.restaurant.backendAddress);
     setState(() {
       tableRows = initialTables;
     });
@@ -86,6 +94,9 @@ class _TableManagerState extends State<TableManager> {
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop();
+                if (title == 'Success') {
+                  _loadInitialTables();
+                }
               },
               child: const Text('OK'),
             ),
@@ -181,19 +192,58 @@ class _TableManagerState extends State<TableManager> {
   }
 }
 
-Future<List<DataRow>> _allTables() async {
-  return [
-    const DataRow(cells: [
-      DataCell(Text('Table 1')),
-      DataCell(Text('4')),
-      DataCell(Text('North')),
-      DataCell(Text('Available')),
-    ]),
-    const DataRow(cells: [
-      DataCell(Text('Table 2')),
-      DataCell(Text('2')),
-      DataCell(Text('East')),
-      DataCell(Text('Occupied')),
-    ]),
-  ];
+final Map<String, Color> statusColors = {
+  'Free': Colors.green,
+  'Occupied': Colors.red,
+  'Reserved': Colors.orange,
+  'Cleaning': Colors.blue,
+};
+
+Future<List<DataRow>> _allTablesDataRows(String backendAddress) async {
+  List<DataRow> tableRows = [];
+  List<TableObject> tables = await _allTablesCollector(backendAddress);
+
+  for (var table in tables) {
+    table.status = capitalize(table.status);
+    Color statusColor = statusColors[table.status] ?? Colors.grey;
+    tableRows.add(DataRow(cells: [
+      DataCell(
+        Text(table.name),
+      ),
+      DataCell(
+        Text(table.seats.toString()),
+      ),
+      DataCell(
+        Text(table.region),
+      ),
+      DataCell(
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+          decoration: BoxDecoration(
+            color: statusColor.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(color: statusColor),
+          ),
+          child: Text(
+            table.status,
+            style: TextStyle(
+              color: statusColor,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ),
+      ),
+    ]));
+  }
+  return tableRows;
+}
+
+Future<List<TableObject>> _allTablesCollector(String backendAddress) async {
+  List<TableObject> tables = [];
+  for (var table in await getAllTables(backendAddress)) {
+    TableObject currentTable = TableObject(
+        table["name"], table["seats"], table["status"], table["region"]);
+    tables.add(currentTable);
+  }
+  return tables;
 }
