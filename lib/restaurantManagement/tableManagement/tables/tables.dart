@@ -1,12 +1,9 @@
 import 'dart:async';
-import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:restaurant_manager/classes/table.dart';
-
 import '../../../classes/other.dart';
 import '../../../classes/restaurant.dart';
-import '../../../http/setup/tables/tableManagement.dart';
+import '../../../http/setup/tables/tableManagement.dart' as http_table;
 
 class TableManager extends StatefulWidget {
   final Restaurant restaurant;
@@ -18,7 +15,6 @@ class TableManager extends StatefulWidget {
 }
 
 class _TableManagerState extends State<TableManager> {
-  // Variables for form input
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _seatsController = TextEditingController();
   String _selectedRegion = 'North';
@@ -35,22 +31,22 @@ class _TableManagerState extends State<TableManager> {
   @override
   void initState() {
     super.initState();
-    _loadInitialTables();
-    _autoRefreshTimer = Timer.periodic(
-        const Duration(minutes: 1), (Timer t) => _loadInitialTables());
+    _loadTables();
+    _autoRefreshTimer =
+        Timer.periodic(const Duration(minutes: 1), (Timer t) => _loadTables());
   }
 
-  Future<void> _loadInitialTables() async {
+  Future<void> _loadTables() async {
     final initialTables =
-        await _allTablesDataRows(widget.restaurant.backendAddress);
+        await _allTablesDataRows(context, widget.restaurant.backendAddress);
     setState(() {
       tableRows = initialTables;
     });
   }
 
-  Future<void> _addNewRestaurant(
+  Future<void> _addNewTable(
       String tableName, String seats, String region) async {
-    final response = await createTable(
+    final response = await http_table.createTable(
       widget.restaurant.backendAddress,
       tableName,
       seats,
@@ -95,7 +91,7 @@ class _TableManagerState extends State<TableManager> {
               onPressed: () {
                 Navigator.of(context).pop();
                 if (title == 'Success') {
-                  _loadInitialTables();
+                  _loadTables();
                 }
               },
               child: const Text('OK'),
@@ -123,40 +119,34 @@ class _TableManagerState extends State<TableManager> {
               style: Theme.of(context).textTheme.headlineLarge,
             ),
             const SizedBox(height: 20),
-            DataTable(
-              columns: const [
-                DataColumn(label: Text("Table Name")),
-                DataColumn(label: Text("Seats")),
-                DataColumn(label: Text("Region")),
-                DataColumn(label: Text("Status")),
-              ],
-              rows: tableRows,
+            InkWell(
+              child: DataTable(
+                columns: const [
+                  DataColumn(label: Text("Table Name")),
+                  DataColumn(label: Text("Seats")),
+                  DataColumn(label: Text("Region")),
+                  DataColumn(label: Text("Status")),
+                ],
+                rows: tableRows,
+              ),
             ),
-            const SizedBox(height: 20), // Spacing before the form
-
-            // New Table Form
+            const SizedBox(height: 20),
             Text(
               "Add New Table",
               style: Theme.of(context).textTheme.headlineSmall,
             ),
             const SizedBox(height: 10),
-
-            // Name Input
             TextField(
               controller: _nameController,
               decoration: const InputDecoration(labelText: 'Table Name'),
             ),
             const SizedBox(height: 10),
-
-            // Seats Input
             TextField(
               controller: _seatsController,
               decoration: const InputDecoration(labelText: 'Seats (Number)'),
               keyboardType: TextInputType.number,
             ),
             const SizedBox(height: 10),
-
-            // Region Dropdown
             DropdownButton<String>(
               value: _selectedRegion,
               items: <String>['North', 'East', 'South', 'West']
@@ -177,7 +167,7 @@ class _TableManagerState extends State<TableManager> {
             // Add Table Button
             ElevatedButton(
               onPressed: () {
-                _addNewRestaurant(
+                _addNewTable(
                   _nameController.text,
                   _seatsController.text,
                   _selectedRegion,
@@ -190,60 +180,144 @@ class _TableManagerState extends State<TableManager> {
       ),
     );
   }
-}
 
-final Map<String, Color> statusColors = {
-  'Free': Colors.green,
-  'Occupied': Colors.red,
-  'Reserved': Colors.orange,
-  'Cleaning': Colors.blue,
-};
+  final Map<String, Color> statusColors = {
+    'Free': Colors.green,
+    'Occupied': Colors.red,
+    'Reserved': Colors.orange,
+    'Cleaning': Colors.blue,
+  };
 
-Future<List<DataRow>> _allTablesDataRows(String backendAddress) async {
-  List<DataRow> tableRows = [];
-  List<TableObject> tables = await _allTablesCollector(backendAddress);
+// Dropdown menu items for status selection
+  final List<String> statusOptions = [
+    'Free',
+    'Occupied',
+    'Reserved',
+    'Cleaning'
+  ];
 
-  for (var table in tables) {
-    table.status = capitalize(table.status);
-    Color statusColor = statusColors[table.status] ?? Colors.grey;
-    tableRows.add(DataRow(cells: [
-      DataCell(
-        Text(table.name),
-      ),
-      DataCell(
-        Text(table.seats.toString()),
-      ),
-      DataCell(
-        Text(table.region),
-      ),
-      DataCell(
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          decoration: BoxDecoration(
-            color: statusColor.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: statusColor),
-          ),
-          child: Text(
-            table.status,
-            style: TextStyle(
-              color: statusColor,
-              fontWeight: FontWeight.bold,
+  Future<List<DataRow>> _allTablesDataRows(
+      BuildContext context, String backendAddress) async {
+    List<DataRow> tableRows = [];
+    List<TableObject> tables = await _allTablesCollector(backendAddress);
+
+    for (var table in tables) {
+      table.status = capitalize(table.status);
+      Color statusColor = statusColors[table.status] ?? Colors.grey;
+      tableRows.add(
+        DataRow(
+          cells: [
+            DataCell(Text(table.name)),
+            DataCell(Text(table.seats.toString())),
+            DataCell(Text(table.region)),
+            DataCell(
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                decoration: BoxDecoration(
+                  color: statusColor.withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                  border: Border.all(color: statusColor),
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: DropdownButton<String>(
+                        value: table.status,
+                        underline: Container(),
+                        onChanged: (String? newStatus) async {
+                          if (newStatus != null) {
+                            table.status = newStatus;
+                            await _updateTableStatus(
+                                backendAddress, table.name, newStatus);
+                            _loadTables();
+                          }
+                        },
+                        items: statusOptions
+                            .map<DropdownMenuItem<String>>((String value) {
+                          return DropdownMenuItem<String>(
+                            value: value,
+                            child: Text(
+                              value,
+                              style: TextStyle(
+                                color: statusColors[value] ?? Colors.grey,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             ),
-          ),
+          ],
+          onLongPress: () {
+            _showDeletePopup(context, table.name, backendAddress);
+          },
         ),
-      ),
-    ]));
+      );
+    }
+    return tableRows;
   }
-  return tableRows;
-}
 
-Future<List<TableObject>> _allTablesCollector(String backendAddress) async {
-  List<TableObject> tables = [];
-  for (var table in await getAllTables(backendAddress)) {
-    TableObject currentTable = TableObject(
-        table["name"], table["seats"], table["status"], table["region"]);
-    tables.add(currentTable);
+  Future<void> _updateTableStatus(
+      String backendAddress, String tableName, String newStatus) async {
+    await http_table.updateTableStatus(backendAddress, tableName, newStatus);
   }
-  return tables;
+
+  Future<List<TableObject>> _allTablesCollector(String backendAddress) async {
+    List<TableObject> tables = [];
+    for (var table in await http_table.getAllTables(backendAddress)) {
+      TableObject currentTable = TableObject(
+          table["name"], table["seats"], table["status"], table["region"]);
+      tables.add(currentTable);
+    }
+    return tables;
+  }
+
+  void _showDeletePopup(
+      BuildContext context, String tableName, String backendAddress) {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.all(16.0),
+          height: 150,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Delete Table',
+                style: Theme.of(context).textTheme.headlineSmall,
+              ),
+              const SizedBox(height: 10),
+              Text('Are you sure you want to delete the table "$tableName"?'),
+              const Spacer(),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: [
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
+                    child: const Text('Cancel'),
+                  ),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      http_table.deleteTable(backendAddress, tableName);
+                      _loadTables();
+                    },
+                    child: const Text('Delete'),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 }
