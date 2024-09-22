@@ -18,7 +18,7 @@ final appColorScheme = ColorScheme(
   onPrimary: Colors.grey[800]!,
   secondary: Colors.amber.shade600,
   onSecondary: Colors.black,
-  error: Colors.red,
+  error: Colors.red.shade400,
   onError: Colors.white,
   surface: Colors.grey[800]!,
   onSurface: Colors.grey[100]!,

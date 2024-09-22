@@ -4,6 +4,7 @@ import 'package:restaurant_manager/classes/table.dart';
 import '../../../classes/other.dart';
 import '../../../classes/restaurant.dart';
 import '../../../http/setup/tables/tableManagement.dart' as http_table;
+import '../qrCode/QR-CodeGeneration.dart';
 
 class TableManager extends StatefulWidget {
   final Restaurant restaurant;
@@ -122,10 +123,12 @@ class _TableManagerState extends State<TableManager> {
             InkWell(
               child: DataTable(
                 columns: const [
+                  DataColumn(label: Text("Delete Table")),
                   DataColumn(label: Text("Table Name")),
                   DataColumn(label: Text("Seats")),
                   DataColumn(label: Text("Region")),
                   DataColumn(label: Text("Status")),
+                  DataColumn(label: Text("QR-Code")),
                 ],
                 rows: tableRows,
               ),
@@ -207,6 +210,13 @@ class _TableManagerState extends State<TableManager> {
       tableRows.add(
         DataRow(
           cells: [
+            DataCell(IconButton(
+              tooltip: "Delete this Table",
+              icon: const Icon(Icons.delete),
+              onPressed: () =>
+                  _showDeletePopup(context, table.name, backendAddress),
+              color: Theme.of(context).colorScheme.error,
+            )),
             DataCell(Text(table.name)),
             DataCell(Text(table.seats.toString())),
             DataCell(Text(table.region)),
@@ -252,10 +262,17 @@ class _TableManagerState extends State<TableManager> {
                 ),
               ),
             ),
+            DataCell(IconButton(
+                icon: const Icon(Icons.qr_code),
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return generateQrCodeForTable(backendAddress, table.name);
+                    },
+                  );
+                }))
           ],
-          onLongPress: () {
-            _showDeletePopup(context, table.name, backendAddress);
-          },
         ),
       );
     }

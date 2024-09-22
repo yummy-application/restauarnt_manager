@@ -41,6 +41,9 @@ dependencies:
   sqflite_common_ffi: any
   crypto: ^3.0.2
   http: any
+  qr_flutter:
+    git:
+      url: https://github.com/theyakka/qr.flutter.git
 dev_dependencies:
   flutter_test:
     sdk: flutter
