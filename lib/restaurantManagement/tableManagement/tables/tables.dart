@@ -263,15 +263,20 @@ class _TableManagerState extends State<TableManager> {
               ),
             ),
             DataCell(IconButton(
-                icon: const Icon(Icons.qr_code),
-                onPressed: () {
-                  showModalBottomSheet(
-                    context: context,
-                    builder: (BuildContext context) {
-                      return generateQrCodeForTable(backendAddress, table.name);
-                    },
-                  );
-                }))
+              icon: const Icon(Icons.qr_code),
+              onPressed: () {
+                showModalBottomSheet(
+                  isScrollControlled: true,
+                  context: context,
+                  builder: (BuildContext context) {
+                    return QrCodeGenerator(
+                      backendAddress: backendAddress,
+                      tableName: table.name,
+                    );
+                  },
+                );
+              },
+            ))
           ],
         ),
       );
