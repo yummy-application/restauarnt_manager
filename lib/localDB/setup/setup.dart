@@ -4,7 +4,7 @@ import 'package:path/path.dart';
 
 Future<void> dbSetup() async {
   var db = await openDatabase(join(await getDatabasesPath(), 'local.db'),
-      version: 9, onCreate: (db, version) {
+      version: 13, onCreate: (db, version) {
     db.execute(
       "CREATE TABLE IF NOT EXISTS restaurants(backend_url Text,password_hash Text)",
     );

@@ -71,7 +71,7 @@ class _QrCodeGeneratorState extends State<QrCodeGenerator> {
     } catch (e) {
       print("Error saving QR code with image: $e");
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to save QR Code with image')),
+        const SnackBar(content: Text('Failed to save QR Code with image')),
       );
     }
   }
@@ -92,7 +92,7 @@ class _QrCodeGeneratorState extends State<QrCodeGenerator> {
                 height: 300,
               ),
               // The circular overlay image (e.g., logo)
-              CircleAvatar(
+              const CircleAvatar(
                 radius: 50,
                 backgroundImage: NetworkImage(
                     'https://cloud.appwrite.io/v1/storage/buckets/66cc9e94000920bfb736/files/66cc9f4b003d0b240b47/view?project=66ca28ea003c2ddf0db8&project=66ca28ea003c2ddf0db8'), // Replace with your image URL
@@ -101,29 +101,13 @@ class _QrCodeGeneratorState extends State<QrCodeGenerator> {
           ),
         ),
         Container(
-          padding: EdgeInsets.all(20),
-          child: ElevatedButton(
-            onPressed: _downloadQrCode,
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Text(
-                  "Download QR Code (Fallback)",
-                  style: TextStyle(color: Colors.grey[800]!),
-                ),
-                Icon(Icons.download, color: Colors.grey[800]!),
-              ],
-            ),
-            style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all<Color>(Colors.green),
-              elevation: MaterialStateProperty.all<double>(3),
-            ),
-          ),
-        ),
-        Container(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.all(20),
           child: ElevatedButton(
             onPressed: _captureAndSaveQrCodeWithImage,
+            style: ButtonStyle(
+              backgroundColor: WidgetStateProperty.all<Color>(Colors.blue),
+              elevation: WidgetStateProperty.all<double>(3),
+            ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -134,9 +118,25 @@ class _QrCodeGeneratorState extends State<QrCodeGenerator> {
                 Icon(Icons.download, color: Colors.grey[800]!),
               ],
             ),
+          ),
+        ),
+        Container(
+          padding: const EdgeInsets.all(20),
+          child: ElevatedButton(
+            onPressed: _downloadQrCode,
             style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all<Color>(Colors.blue),
-              elevation: MaterialStateProperty.all<double>(3),
+              backgroundColor: WidgetStateProperty.all<Color>(Colors.green),
+              elevation: WidgetStateProperty.all<double>(3),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  "Download QR Code (Fallback)",
+                  style: TextStyle(color: Colors.grey[800]!),
+                ),
+                Icon(Icons.download, color: Colors.grey[800]!),
+              ],
             ),
           ),
         ),
